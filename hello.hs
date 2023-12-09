@@ -10,7 +10,7 @@ myhtml =
     ( append_
         (h1_ "Hello, world!")
         ( append_
-            (p_ "Some text")
+            (p_ "Some <p>'p' tag</p>")
             (p_ "Another paragraph")
         )
     )
