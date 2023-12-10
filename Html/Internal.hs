@@ -28,8 +28,14 @@ p_ = Structure . el "p" . escape
 h1_ :: String -> Structure
 h1_ = Structure . el "h1" . escape
 
-el :: String -> String -> String
-el tag content = "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
+ul_ :: [Structure] -> Structure
+ul_ = list "ul"
+
+ol_ :: [Structure] -> Structure
+ol_ = list "ol"
+
+code_ :: String -> Structure
+code_ = Structure . el "pre" . escape
 
 append_ :: Structure -> Structure -> Structure
 append_ (Structure a) (Structure b) = Structure (a <> b)
@@ -42,6 +48,9 @@ render html =
     Html str -> str
 
 -- * Utilities
+
+el :: String -> String -> String
+el tag content = "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
 
 getStructureString :: Structure -> String
 getStructureString struct =
@@ -59,3 +68,8 @@ escape =
           '\'' -> "&#39;"
           _ -> [c]
    in concat . map escapeChar
+
+list :: String -> [Structure] -> Structure
+list tag =
+  let wrapLi (Structure x) = el "li" x
+   in Structure . el tag . concat . map wrapLi

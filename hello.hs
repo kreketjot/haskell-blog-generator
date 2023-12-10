@@ -11,6 +11,13 @@ myhtml =
         (h1_ "Hello, world!")
         ( append_
             (p_ "Some <p>'p' tag</p>")
-            (p_ "Another paragraph")
+            ( ul_
+                [ p_ "Another paragraph",
+                  ol_
+                    [ code_ "code 1",
+                      code_ "code      2"
+                    ]
+                ]
+            )
         )
     )
