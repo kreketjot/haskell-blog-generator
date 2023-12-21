@@ -6,6 +6,9 @@ newtype Html = Html String
 
 newtype Structure = Structure String
 
+instance Semigroup Structure where
+  (<>) (Structure a) (Structure b) = Structure (a <> b)
+
 type Title = String
 
 -- * EDSL (embedded domain specific language)
@@ -36,9 +39,6 @@ ol_ = list "ol"
 
 code_ :: String -> Structure
 code_ = Structure . el "pre" . escape
-
-append_ :: Structure -> Structure -> Structure
-append_ (Structure a) (Structure b) = Structure (a <> b)
 
 -- * Render
 
