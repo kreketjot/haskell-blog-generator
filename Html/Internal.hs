@@ -1,5 +1,7 @@
 module Html.Internal where
 
+import Numeric.Natural (Natural)
+
 -- * Types
 
 newtype Html = Html String
@@ -8,6 +10,9 @@ newtype Structure = Structure String
 
 instance Semigroup Structure where
   (<>) (Structure a) (Structure b) = Structure (a <> b)
+
+instance Monoid Structure where
+  mempty = empty_
 
 type Title = String
 
@@ -28,8 +33,8 @@ html_ title (Structure content) =
 p_ :: String -> Structure
 p_ = Structure . el "p" . escape
 
-h1_ :: String -> Structure
-h1_ = Structure . el "h1" . escape
+h_ :: Natural -> String -> Structure
+h_ lvl = Structure . el ("h" <> show lvl) . escape
 
 ul_ :: [Structure] -> Structure
 ul_ = list "ul"
@@ -39,6 +44,9 @@ ol_ = list "ol"
 
 code_ :: String -> Structure
 code_ = Structure . el "pre" . escape
+
+empty_ :: Structure
+empty_ = Structure ""
 
 -- * Render
 
@@ -73,3 +81,8 @@ list :: String -> [Structure] -> Structure
 list tag =
   let wrapLi (Structure x) = el "li" x
    in Structure . el tag . concat . map wrapLi
+
+concatStructures :: [Structure] -> Structure
+concatStructures list = case list of
+  [] -> empty_
+  x : xs -> x <> concatStructures xs
