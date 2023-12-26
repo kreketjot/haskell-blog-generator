@@ -75,14 +75,14 @@ escape =
           '"' -> "&quot;"
           '\'' -> "&#39;"
           _ -> [c]
-   in concat . map escapeChar
+   in concatMap escapeChar
 
 list :: String -> [Structure] -> Structure
 list tag =
   let wrapLi (Structure x) = el "li" x
-   in Structure . el tag . concat . map wrapLi
+   in Structure . el tag . concatMap wrapLi
 
 concatStructures :: [Structure] -> Structure
-concatStructures list = case list of
+concatStructures structures = case structures of
   [] -> empty_
   x : xs -> x <> concatStructures xs
