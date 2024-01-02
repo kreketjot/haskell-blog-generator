@@ -1,6 +1,7 @@
-module Html.Internal where
+module HsBlog.Html.Internal where
 
-import Numeric.Natural (Natural)
+
+import           Numeric.Natural                ( Natural )
 
 -- * Types
 
@@ -20,15 +21,7 @@ type Title = String
 
 html_ :: Title -> Structure -> Html
 html_ title (Structure content) =
-  Html
-    ( el
-        "html"
-        ( el
-            "head"
-            (el "title" (escape title))
-            <> el "body" content
-        )
-    )
+  Html (el "html" (el "head" (el "title" (escape title)) <> el "body" content))
 
 p_ :: String -> Structure
 p_ = Structure . el "p" . escape
@@ -51,9 +44,8 @@ empty_ = Structure ""
 -- * Render
 
 render :: Html -> String
-render html =
-  case html of
-    Html str -> str
+render html = case html of
+  Html str -> str
 
 -- * Utilities
 
@@ -61,28 +53,25 @@ el :: String -> String -> String
 el tag content = "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
 
 getStructureString :: Structure -> String
-getStructureString struct =
-  case struct of
-    Structure str -> str
+getStructureString struct = case struct of
+  Structure str -> str
 
 escape :: String -> String
 escape =
-  let escapeChar c =
-        case c of
-          '<' -> "&lt;"
-          '>' -> "&gt;"
-          '&' -> "&amp;"
-          '"' -> "&quot;"
-          '\'' -> "&#39;"
-          _ -> [c]
-   in concatMap escapeChar
+  let escapeChar c = case c of
+        '<'  -> "&lt;"
+        '>'  -> "&gt;"
+        '&'  -> "&amp;"
+        '"'  -> "&quot;"
+        '\'' -> "&#39;"
+        _    -> [c]
+  in  concatMap escapeChar
 
 list :: String -> [Structure] -> Structure
 list tag =
-  let wrapLi (Structure x) = el "li" x
-   in Structure . el tag . concatMap wrapLi
+  let wrapLi (Structure x) = el "li" x in Structure . el tag . concatMap wrapLi
 
 concatStructures :: [Structure] -> Structure
 concatStructures structures = case structures of
-  [] -> empty_
+  []     -> empty_
   x : xs -> x <> concatStructures xs
