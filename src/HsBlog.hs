@@ -1,59 +1,21 @@
-{-# LANGUAGE LambdaCase #-}
-
 module HsBlog
-  ( main
+  ( convertSingle
+  , convertDirectory
   , process
   ) where
 
 import           HsBlog.Convert                 ( convert )
 import qualified HsBlog.Html                   as Html
 import qualified HsBlog.Markup                 as Markup
-import           System.Directory               ( doesFileExist )
-import           System.Environment             ( getArgs )
+import           System.IO
 
-main :: IO ()
-main = getArgs >>= \case
-  [inputFile, outputFile] -> fileIO inputFile outputFile
-  []                      -> stdIO
-  _                       -> invalidInput
+convertSingle :: Html.Title -> Handle -> Handle -> IO ()
+convertSingle title input output = do
+  content <- hGetContents input
+  hPutStrLn output (process title content)
+
+convertDirectory :: FilePath -> FilePath -> IO ()
+convertDirectory = error "Not implemented"
 
 process :: Html.Title -> String -> String
 process title = Html.render . convert title . Markup.parse
-
-confirm :: IO Bool
-confirm = getLine >>= \case
-  "y" -> pure True
-  "n" -> pure False
-  _   -> putStrLn "Invalid response. Use y or n." *> confirm
-
-whenIO :: IO Bool -> IO () -> IO ()
-whenIO condIO action = condIO >>= \cond -> if cond then action else pure ()
-
-fileIO :: String -> String -> IO ()
-fileIO iFile oFile = do
-  iFileExists <- doesFileExist iFile
-  if iFileExists
-    then do
-      oFileExists <- doesFileExist oFile
-      let readProcessWrite = do
-            content <- readFile iFile
-            writeFile oFile (process oFile content)
-      if oFileExists
-        then do
-          putStr "Overwrite out file? (y/n): "
-          whenIO confirm readProcessWrite
-        else readProcessWrite
-    else putStrLn "There is no input file"
-
-stdIO :: IO ()
-stdIO = do
-  putStrLn "Please enter title:"
-  title <- getLine
-  putStrLn "and content:"
-  content <- getContents
-  putStrLn (process title content)
-
-invalidInput :: IO ()
-invalidInput =
-  putStrLn
-    "Either call the program with 2 arguments that represent the files to read and write, or no arguments to work with standard I/O."
