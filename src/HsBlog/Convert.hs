@@ -1,5 +1,6 @@
 module HsBlog.Convert
   ( convert
+  , convertStructure
   ) where
 
 import qualified HsBlog.Html                   as Html
